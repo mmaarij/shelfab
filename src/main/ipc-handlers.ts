@@ -71,9 +71,10 @@ export function registerIpcHandlers(): void {
     const sourcePath = result.filePaths[0];
     const book = getBook(tsgId);
     const title = book?.title || tsgId;
+    const author = book?.author;
 
     // Always copy to library folder — the copy becomes the canonical file
-    const destPath = await copyEpubToLibrary(tsgId, sourcePath, title);
+    const destPath = await copyEpubToLibrary(tsgId, sourcePath, title, author);
 
     // Auto-extract cover from the library copy
     const coverPath = await extractCoverFromEpub(destPath);

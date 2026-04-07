@@ -14,6 +14,8 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
   const [syncRead, setSyncRead] = useState(true);
   const [syncToRead, setSyncToRead] = useState(true);
   const [saved, setSaved] = useState(false);
+  const [showClearModal, setShowClearModal] = useState(false);
+  const [deleteFiles, setDeleteFiles] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -45,17 +47,12 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const handleClearLibrary = async () => {
-    const confirmNuke = window.confirm(
-      'Are you sure you want to clear your library? This will delete all book data from the app.'
-    );
-    if (!confirmNuke) return;
+  const handleClearLibrary = () => {
+    setShowClearModal(true);
+  };
 
-    const includeFiles = window.confirm(
-      'Do you also want to delete all EPUB files from your managed library folder?'
-    );
-
-    await window.electronAPI.clearLibrary(includeFiles);
+  const confirmClearLibrary = async () => {
+    await window.electronAPI.clearLibrary(deleteFiles);
     window.location.reload(); // Refresh to show empty state
   };
 
@@ -150,6 +147,50 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
           </div>
         </div>
       </div>
+
+      {/* Clear Library Modal */}
+      {showClearModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowClearModal(false)} />
+          <div className="relative bg-background border border-border/30 rounded-lg shadow-xl w-full max-w-sm overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+            <div className="p-5 space-y-4">
+              <div className="flex items-center gap-3 text-red-500">
+                <AlertTriangle className="h-5 w-5" />
+                <h3 className="text-sm font-semibold">Clear Library</h3>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Are you sure you want to clear your library? This will delete all book data from the app. This action cannot be undone.
+              </p>
+              
+              <div className="pt-2">
+                <Checkbox
+                  id="delete-files"
+                  label="Also delete all EPUB files from your managed library folder"
+                  checked={deleteFiles}
+                  onChange={(e) => setDeleteFiles((e.target as HTMLInputElement).checked)}
+                />
+              </div>
+            </div>
+            
+            <div className="bg-muted/30 p-4 border-t border-border/20 flex gap-3 justify-end">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowClearModal(false)}
+                className="h-8 text-xs px-4"
+              >
+                Cancel
+              </Button>
+              <Button 
+                variant="destructive" 
+                onClick={confirmClearLibrary}
+                className="h-8 text-xs px-4 bg-red-500 hover:bg-red-600 text-white border-0"
+              >
+                Clear Library
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

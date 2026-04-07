@@ -70,19 +70,31 @@ function findCoverHrefFromMeta(opfContent: string): string | null {
 }
 
 /**
+ * Generates a safe filename for a book.
+ */
+function generateSafeFilename(title: string, author?: string | null, fallbackId?: string): string {
+  let name = title;
+  if (author) {
+    name = `${title} (${author})`;
+  }
+  return name.replace(/[<>:"/\\|?*]/g, '_').trim() || fallbackId || 'book';
+}
+
+/**
  * Copy an EPUB to the managed library folder and update the DB.
  */
 export async function copyEpubToLibrary(
   tsgId: string,
   sourcePath: string,
-  title: string
+  title: string,
+  author?: string | null
 ): Promise<string> {
   const libraryFolder = getSetting('libraryFolder');
   if (!libraryFolder) {
     throw new Error('No managed library folder set. Please set one in Settings.');
   }
 
-  const safeName = title.replace(/[<>:"/\\|?*]/g, '_').trim() || tsgId;
+  const safeName = generateSafeFilename(title, author, tsgId);
   const destPath = path.join(libraryFolder, `${safeName}.epub`);
 
   await fs.promises.copyFile(sourcePath, destPath);
@@ -115,7 +127,7 @@ export async function reExportAllBooks(
       // Check if source file exists
       await fs.promises.access(book.epub_path);
       
-      const safeName = book.title.replace(/[<>:"/\\|?*]/g, '_').trim() || book.tsg_id;
+      const safeName = generateSafeFilename(book.title, book.author, book.tsg_id);
       const destPath = path.join(libraryFolder, `${safeName}.epub`);
 
       // Only copy if the epub_path is different from destPath
@@ -224,7 +236,9 @@ export async function editEpubMetadata(
   if (libraryFolder) {
     const book = getBook(tsgId);
     if (book) {
-      const safeName = (metadata.title || book.title).replace(/[<>:"/\\|?*]/g, '_').trim() || tsgId;
+      const displayTitle = metadata.title || book.title;
+      const displayAuthor = metadata.author || book.author;
+      const safeName = generateSafeFilename(displayTitle, displayAuthor, tsgId);
       const destPath = path.join(libraryFolder, `${safeName}.epub`);
       if (path.resolve(epubPath) !== path.resolve(destPath)) {
         await fs.promises.copyFile(epubPath, destPath);
