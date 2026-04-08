@@ -3,6 +3,7 @@ import { FolderOpen, X, AlertTriangle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Checkbox } from './ui/checkbox';
+import packageJson from '../../../package.json';
 
 interface SettingsPanelProps {
   onClose: () => void;
@@ -60,15 +61,15 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
     <div className="fixed inset-0 z-50 flex">
       <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
 
-      <div className="absolute right-0 top-0 bottom-0 w-full max-w-sm bg-background border-l border-border/30 animate-slide-in overflow-y-auto">
-        <div className="sticky top-0 z-10 bg-background/90 backdrop-blur-xl border-b border-border/20 px-5 py-3 flex items-center justify-between">
+      <div className="absolute right-0 top-0 bottom-0 w-full max-w-sm bg-background border-l border-border/30 animate-slide-in overflow-y-auto flex flex-col">
+        <div className="sticky top-0 z-10 bg-background/90 backdrop-blur-xl border-b border-border/20 px-5 py-3 flex items-center justify-between shrink-0">
           <h2 className="text-sm font-semibold">Settings</h2>
           <button onClick={onClose} className="p-1 rounded hover:bg-card transition-colors">
             <X className="h-4 w-4 text-muted-foreground" />
           </button>
         </div>
 
-        <div className="p-5 space-y-6">
+        <div className="p-5 space-y-6 flex-1 flex flex-col">
           {/* Username */}
           <div className="space-y-1.5">
             <label className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-widest">
@@ -115,20 +116,24 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
               checked={syncToRead}
               onChange={(e) => setSyncToRead((e.target as HTMLInputElement).checked)}
             />
+            <p className="text-[10px] text-muted-foreground/40 leading-relaxed px-1 pt-1">
+              Read/To-Read status is a one-way sync from StoryGraph.
+              It cannot be changed locally and will update on next sync.
+            </p>
           </div>
 
-          <Button onClick={handleSave} className="w-full h-9 text-xs">
+          <Button onClick={handleSave} className="w-full h-9 text-xs shrink-0">
             {saved ? 'Saved ✓' : 'Save Settings'}
           </Button>
 
           {/* Destructive Actions */}
-          <div className="pt-6 mt-6 border-t border-border/20 space-y-3">
+          <div className="pt-6 border-t border-border/20 space-y-3 shrink-0">
             <h3 className="text-[10px] font-medium text-red-500/60 uppercase tracking-widest">
               Destructive Actions
             </h3>
             <button
               onClick={handleClearLibrary}
-              className="w-full h-9 px-3 rounded-md border border-red-500/20 bg-red-500/5 text-red-500 text-xs hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2"
+              className="w-full h-9 px-3 rounded-md border border-red-500/20 bg-red-500/5 text-red-500 text-xs hover:bg-red-500/10 transition-colors flex items-center justify-center gap-2 shrink-0"
             >
               <AlertTriangle className="h-3.5 w-3.5" />
               Clear Library & Reset App
@@ -138,12 +143,14 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
             </p>
           </div>
 
+          <div className="flex-1" />
+
           {/* About */}
-          <div className="pt-4 border-t border-border/20 space-y-2">
-            <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
-              Read/To-Read status is a one-way sync from StoryGraph.
-              It cannot be changed locally and will update on next sync.
-            </p>
+          <div className="pt-4 mt-auto border-t border-border/20 space-y-4 shrink-0">
+            <div className="flex items-center justify-between text-[10px] text-muted-foreground/30 font-medium uppercase tracking-widest pt-2">
+              <span>Shelfab</span>
+              <span>v{packageJson.version}</span>
+            </div>
           </div>
         </div>
       </div>
