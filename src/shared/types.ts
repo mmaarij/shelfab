@@ -7,7 +7,7 @@ export interface Book {
   series_name: string | null;
   series_number: string | null;
   description: string;
-  status: 'read' | 'to-read';
+  status: 'read' | 'currently-reading' | 'to-read';
   epub_path: string | null;
   cover_path: string | null;
 }
@@ -15,6 +15,7 @@ export interface Book {
 export interface SyncOptions {
   username: string;
   syncRead: boolean;
+  syncCurrentlyReading: boolean;
   syncToRead: boolean;
 }
 
@@ -72,7 +73,7 @@ export interface ElectronAPI {
   openExternal: (url: string) => Promise<void>;
   clearLibrary: (includeFiles: boolean) => Promise<void>;
   isOnboarded: () => Promise<boolean>;
-  completeOnboarding: (username: string, libraryFolder: string, syncRead: boolean, syncToRead: boolean) => Promise<void>;
+  completeOnboarding: (username: string, libraryFolder: string, syncRead: boolean, syncCurrentlyReading: boolean, syncToRead: boolean) => Promise<void>;
 }
 
 declare global {

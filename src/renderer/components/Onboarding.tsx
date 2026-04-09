@@ -14,6 +14,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
   const [username, setUsername] = useState('');
   const [libraryFolder, setLibraryFolder] = useState('');
   const [syncRead, setSyncRead] = useState(true);
+  const [syncCurrentlyReading, setSyncCurrentlyReading] = useState(true);
   const [syncToRead, setSyncToRead] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -26,7 +27,7 @@ export function Onboarding({ onComplete }: OnboardingProps) {
     if (!username.trim() || !libraryFolder) return;
     setSaving(true);
     try {
-      await window.electronAPI.completeOnboarding(username.trim(), libraryFolder, syncRead, syncToRead);
+      await window.electronAPI.completeOnboarding(username.trim(), libraryFolder, syncRead, syncCurrentlyReading, syncToRead);
       onComplete();
     } catch (err) {
       console.error(err);
@@ -113,6 +114,12 @@ export function Onboarding({ onComplete }: OnboardingProps) {
                 label="Sync books you've read"
                 checked={syncRead}
                 onChange={(e) => setSyncRead((e.target as HTMLInputElement).checked)}
+              />
+              <Checkbox
+                id="onboard-sync-currentlyreading"
+                label="Sync your currently reading"
+                checked={syncCurrentlyReading}
+                onChange={(e) => setSyncCurrentlyReading((e.target as HTMLInputElement).checked)}
               />
               <Checkbox
                 id="onboard-sync-toread"

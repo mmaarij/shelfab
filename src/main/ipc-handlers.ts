@@ -91,12 +91,13 @@ export function registerIpcHandlers(): void {
     const username = getSetting('tsg_username');
     const syncRead = getSetting('syncRead') !== 'false';
     const syncToRead = getSetting('syncToRead') !== 'false';
+    const syncCurrentlyReading = getSetting('syncCurrentlyReading') !== 'false';
 
     if (!username) {
       throw new Error('No StoryGraph username configured. Please set it in Settings.');
     }
 
-    await syncLibrary({ username, syncRead, syncToRead }, win);
+    await syncLibrary({ username, syncRead, syncToRead, syncCurrentlyReading }, win);
   });
 
   // --- EPUB ---
@@ -229,10 +230,11 @@ export function registerIpcHandlers(): void {
     return !!(username && folder);
   });
 
-  ipcMain.handle('onboarding:complete', async (_event, username: string, libraryFolder: string, syncRead: boolean, syncToRead: boolean) => {
+  ipcMain.handle('onboarding:complete', async (_event, username: string, libraryFolder: string, syncRead: boolean, syncCurrentlyReading: boolean, syncToRead: boolean) => {
     setSetting('tsg_username', username);
     setSetting('libraryFolder', libraryFolder);
     setSetting('syncRead', String(syncRead));
+    setSetting('syncCurrentlyReading', String(syncCurrentlyReading));
     setSetting('syncToRead', String(syncToRead));
   });
 }

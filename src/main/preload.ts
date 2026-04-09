@@ -37,8 +37,8 @@ const api: ElectronAPI = {
   openExternal: (url) => ipcRenderer.invoke('system:open-external', url),
   clearLibrary: (includeFiles) => ipcRenderer.invoke('db:nuke', includeFiles),
   isOnboarded: () => ipcRenderer.invoke('onboarding:check'),
-  completeOnboarding: (username, libraryFolder, syncRead, syncToRead) =>
-    ipcRenderer.invoke('onboarding:complete', username, libraryFolder, syncRead, syncToRead),
+  completeOnboarding: (username, libraryFolder, syncRead, syncCurrentlyReading, syncToRead) =>
+    ipcRenderer.invoke('onboarding:complete', username, libraryFolder, syncRead, syncCurrentlyReading, syncToRead),
 };
 
 contextBridge.exposeInMainWorld('electronAPI', api);

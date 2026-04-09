@@ -46,7 +46,7 @@ async function fetchPage(url: string): Promise<string> {
 
 async function fetchBookIdsFromList(
   username: string,
-  listType: 'to-read' | 'books-read',
+  listType: 'to-read' | 'currently-reading' | 'books-read',
   win: BrowserWindow | null
 ): Promise<string[]> {
   const ids: string[] = [];
@@ -126,12 +126,19 @@ export async function syncLibrary(
   win: BrowserWindow | null
 ): Promise<void> {
   try {
-    const allIds: Map<string, 'read' | 'to-read'> = new Map(); // id -> status
+    const allIds: Map<string, 'read' | 'currently-reading' | 'to-read'> = new Map(); // id -> status
 
     if (options.syncToRead) {
       const toReadIds = await fetchBookIdsFromList(options.username, 'to-read', win);
       for (const id of toReadIds) {
         allIds.set(id, 'to-read');
+      }
+    }
+
+    if (options.syncCurrentlyReading) {
+      const currentlyReadingIds = await fetchBookIdsFromList(options.username, 'currently-reading', win);
+      for (const id of currentlyReadingIds) {
+        allIds.set(id, 'currently-reading'); // If in both lists somehow, this overrides to-read
       }
     }
 
@@ -208,6 +215,7 @@ export async function syncLibrary(
     for (const book of localBooks) {
       const shouldHaveBeenSynced = 
         (book.status === 'read' && options.syncRead) || 
+        (book.status === 'currently-reading' && options.syncCurrentlyReading) ||
         (book.status === 'to-read' && options.syncToRead);
       
       if (shouldHaveBeenSynced && !allIds.has(book.tsg_id)) {

@@ -53,8 +53,11 @@ export function BookCard({ book, onClick }: BookCardProps) {
 
         {/* Status */}
         <div className="absolute bottom-1.5 left-1.5">
-          <Badge variant={book.status === 'read' ? 'success' : 'warning'} className="text-[9px] px-1.5 py-0">
-            {book.status === 'read' ? 'Read' : 'To Read'}
+          <Badge 
+            variant={book.status === 'read' ? 'success' : book.status === 'currently-reading' ? 'default' : 'warning'} 
+            className="text-[9px] px-1.5 py-0"
+          >
+            {book.status === 'read' ? 'Read' : book.status === 'currently-reading' ? 'Reading' : 'To Read'}
           </Badge>
         </div>
       </div>

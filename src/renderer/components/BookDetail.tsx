@@ -148,8 +148,11 @@ export function BookDetail({ book, onClose, onSave }: BookDetailProps) {
           <div className="flex items-center gap-3">
             <h2 className="text-sm font-semibold">Edit Book</h2>
             <div className="flex items-center gap-1.5 h-full">
-              <Badge variant={book.status === 'read' ? 'success' : 'warning'} className="text-[9px] px-1.5 py-0">
-                {book.status === 'read' ? 'Read' : 'To Read'}
+                <Badge 
+                  variant={book.status === 'read' ? 'success' : book.status === 'currently-reading' ? 'default' : 'warning'} 
+                  className="text-[9px] px-1.5 py-0"
+                >
+                  {book.status === 'read' ? 'Read' : book.status === 'currently-reading' ? 'Reading' : 'To Read'}
               </Badge>
               {hasEpub && (
                 <Badge variant="success" className="text-[9px] px-1.5 py-0 bg-emerald-500/10 text-emerald-500 hover:bg-emerald-500/20 border-0">

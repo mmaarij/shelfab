@@ -13,6 +13,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
   const [username, setUsername] = useState('');
   const [libraryFolder, setLibraryFolder] = useState('');
   const [syncRead, setSyncRead] = useState(true);
+  const [syncCurrentlyReading, setSyncCurrentlyReading] = useState(true);
   const [syncToRead, setSyncToRead] = useState(true);
   const [saved, setSaved] = useState(false);
   const [showClearModal, setShowClearModal] = useState(false);
@@ -23,10 +24,12 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
       const u = await window.electronAPI.getSetting('tsg_username');
       const f = await window.electronAPI.getSetting('libraryFolder');
       const sr = await window.electronAPI.getSetting('syncRead');
+      const scr = await window.electronAPI.getSetting('syncCurrentlyReading');
       const st = await window.electronAPI.getSetting('syncToRead');
       if (u) setUsername(u);
       if (f) setLibraryFolder(f);
       if (sr !== null) setSyncRead(sr !== 'false');
+      if (scr !== null) setSyncCurrentlyReading(scr !== 'false');
       if (st !== null) setSyncToRead(st !== 'false');
     };
     load();
@@ -43,6 +46,7 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
   const handleSave = async () => {
     await window.electronAPI.setSetting('tsg_username', username.trim());
     await window.electronAPI.setSetting('syncRead', String(syncRead));
+    await window.electronAPI.setSetting('syncCurrentlyReading', String(syncCurrentlyReading));
     await window.electronAPI.setSetting('syncToRead', String(syncToRead));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -109,6 +113,12 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
               label="Sync books you've read"
               checked={syncRead}
               onChange={(e) => setSyncRead((e.target as HTMLInputElement).checked)}
+            />
+            <Checkbox
+              id="settings-sync-currentlyreading"
+              label="Sync your currently reading"
+              checked={syncCurrentlyReading}
+              onChange={(e) => setSyncCurrentlyReading((e.target as HTMLInputElement).checked)}
             />
             <Checkbox
               id="settings-sync-toread"

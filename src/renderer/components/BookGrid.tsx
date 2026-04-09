@@ -12,7 +12,7 @@ interface BookGridProps {
   progress: SyncProgress | null;
 }
 
-type FilterType = 'all' | 'read' | 'to-read' | 'has-epub' | 'no-epub' | 'series';
+type FilterType = 'all' | 'read' | 'currently-reading' | 'to-read' | 'has-epub' | 'no-epub' | 'series';
 
 export function BookGrid({ books, onBookClick, progress }: BookGridProps) {
   const [search, setSearch] = useState('');
@@ -29,6 +29,7 @@ export function BookGrid({ books, onBookClick, progress }: BookGridProps) {
     let matchesFilter = true;
     switch (filter) {
       case 'read': matchesFilter = book.status === 'read'; break;
+      case 'currently-reading': matchesFilter = book.status === 'currently-reading'; break;
       case 'to-read': matchesFilter = book.status === 'to-read'; break;
       case 'has-epub': matchesFilter = !!book.epub_path; break;
       case 'no-epub': matchesFilter = !book.epub_path; break;
@@ -48,6 +49,7 @@ export function BookGrid({ books, onBookClick, progress }: BookGridProps) {
 
   const filters: { key: FilterType; label: string; count: number }[] = [
     { key: 'all', label: 'All', count: books.length },
+    { key: 'currently-reading', label: 'Reading', count: books.filter(b => b.status === 'currently-reading').length },
     { key: 'read', label: 'Read', count: books.filter(b => b.status === 'read').length },
     { key: 'to-read', label: 'To Read', count: books.filter(b => b.status === 'to-read').length },
     { key: 'has-epub', label: 'EPUB', count: books.filter(b => b.epub_path).length },
@@ -250,9 +252,11 @@ export function BookGrid({ books, onBookClick, progress }: BookGridProps) {
                     </span>
                   )}
                   <span className={`text-[9px] px-1.5 py-0.5 rounded font-medium ${
-                    book.status === 'read' ? 'bg-emerald-500/10 text-emerald-400/80' : 'bg-amber-500/10 text-amber-400/80'
+                    book.status === 'read' ? 'bg-emerald-500/10 text-emerald-400/80' : 
+                    book.status === 'currently-reading' ? 'bg-primary/10 text-primary' :
+                    'bg-amber-500/10 text-amber-400/80'
                   }`}>
-                    {book.status === 'read' ? 'Read' : 'To Read'}
+                    {book.status === 'read' ? 'Read' : book.status === 'currently-reading' ? 'Reading' : 'To Read'}
                   </span>
                 </div>
               </button>
