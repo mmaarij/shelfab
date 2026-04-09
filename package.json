@@ -1,7 +1,7 @@
 {
   "name": "shelfab",
   "productName": "Shelfab",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Fabricate your shelf — A Zotero-like EPUB library manager with StoryGraph sync",
   "author": "mmaarij",
   "license": "GPL-3.0",
