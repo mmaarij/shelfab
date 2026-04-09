@@ -19,6 +19,7 @@ export function initDatabase(): void {
       series_name TEXT,
       series_number TEXT,
       description TEXT NOT NULL DEFAULT '',
+      isbn TEXT,
       status TEXT NOT NULL DEFAULT 'to-read',
       epub_path TEXT,
       cover_path TEXT
@@ -29,6 +30,12 @@ export function initDatabase(): void {
       value TEXT NOT NULL
     );
   `);
+  
+  try {
+    db.prepare('ALTER TABLE books ADD COLUMN isbn TEXT').run();
+  } catch (e) {
+    // Column might already exist, ignore mapping error
+  }
 }
 
 export function getDatabase(): Database.Database {
@@ -57,6 +64,7 @@ export function upsertBook(book: Partial<Book> & { tsg_id: string; status: strin
         series_name = COALESCE(?, series_name),
         series_number = COALESCE(?, series_number),
         description = COALESCE(NULLIF(?, ''), description),
+        isbn = COALESCE(?, isbn),
         status = ?
       WHERE tsg_id = ?
     `).run(
@@ -65,13 +73,14 @@ export function upsertBook(book: Partial<Book> & { tsg_id: string; status: strin
       book.series_name || null,
       book.series_number || null,
       book.description || '',
+      book.isbn || null,
       book.status,
       book.tsg_id
     );
   } else {
     db.prepare(`
-      INSERT INTO books (tsg_id, title, author, series_name, series_number, description, status, epub_path, cover_path)
-      VALUES (?, ?, ?, ?, ?, ?, ?, NULL, NULL)
+      INSERT INTO books (tsg_id, title, author, series_name, series_number, description, isbn, status, epub_path, cover_path)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL)
     `).run(
       book.tsg_id,
       book.title || '',
@@ -79,6 +88,7 @@ export function upsertBook(book: Partial<Book> & { tsg_id: string; status: strin
       book.series_name || null,
       book.series_number || null,
       book.description || '',
+      book.isbn || null,
       book.status
     );
   }
@@ -86,8 +96,8 @@ export function upsertBook(book: Partial<Book> & { tsg_id: string; status: strin
 
 export function updateBookMetadata(tsgId: string, metadata: BookMetadata): void {
   db.prepare(`
-    UPDATE books SET title = ?, author = ?, series_name = ?, series_number = ?, description = ? WHERE tsg_id = ?
-  `).run(metadata.title, metadata.author, metadata.series_name || null, metadata.series_number || null, metadata.description, tsgId);
+    UPDATE books SET title = ?, author = ?, series_name = ?, series_number = ?, description = ?, isbn = ? WHERE tsg_id = ?
+  `).run(metadata.title, metadata.author, metadata.series_name || null, metadata.series_number || null, metadata.description, metadata.isbn || null, tsgId);
 }
 
 export function linkEpub(tsgId: string, epubPath: string | null): void {

@@ -277,6 +277,20 @@ function updateOpfMetadata(opfContent: string, metadata: BookMetadata): string {
     );
   }
 
+  if (metadata.isbn) {
+    if (opfContent.match(/<dc:identifier[^>]*opf:scheme="ISBN"[^>]*>/i)) {
+      opfContent = opfContent.replace(
+        /<dc:identifier[^>]*opf:scheme="ISBN"[^>]*>.*?<\/dc:identifier>/is,
+        `<dc:identifier opf:scheme="ISBN">${escapeXml(metadata.isbn)}</dc:identifier>`
+      );
+    } else {
+      opfContent = opfContent.replace(
+        /(<dc:title[^>]*>.*?<\/dc:title>)/s,
+        `$1\n    <dc:identifier id="isbn" opf:scheme="ISBN">${escapeXml(metadata.isbn)}</dc:identifier>`
+      );
+    }
+  }
+
   return opfContent;
 }
 

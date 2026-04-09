@@ -19,7 +19,7 @@ export function BookDetail({ book, onClose, onSave }: BookDetailProps) {
   const [seriesNumber, setSeriesNumber] = useState(book.series_number || '');
   const [description, setDescription] = useState(book.description);
   const [coverPath, setCoverPath] = useState(book.cover_path || '');
-  const [isbn, setIsbn] = useState('');
+  const [isbn, setIsbn] = useState(book.isbn || '');
   const [hasEpub, setHasEpub] = useState(!!book.epub_path);
   const [saving, setSaving] = useState(false);
   const [searchingIsbn, setSearchingIsbn] = useState(false);
@@ -35,6 +35,7 @@ export function BookDetail({ book, onClose, onSave }: BookDetailProps) {
     setSeriesNumber(book.series_number || '');
     setDescription(book.description);
     setCoverPath(book.cover_path || '');
+    setIsbn(book.isbn || '');
     setHasEpub(!!book.epub_path);
     setCoverResults(null);
     setMsg(null);
@@ -50,6 +51,7 @@ export function BookDetail({ book, onClose, onSave }: BookDetailProps) {
         series_name: seriesName,
         series_number: seriesNumber,
         description,
+        isbn,
         coverImagePath: coverPath && coverPath !== book.cover_path ? coverPath : undefined,
       };
       await window.electronAPI.updateBookMetadata(book.tsg_id, metadata);
@@ -233,7 +235,7 @@ export function BookDetail({ book, onClose, onSave }: BookDetailProps) {
           {/* ISBN */}
           <div className="space-y-1.5">
             <label className="text-[10px] font-medium text-muted-foreground/60 uppercase tracking-widest">
-              ISBN Lookup
+              ISBN
             </label>
             <div className="flex gap-1.5">
               <Input

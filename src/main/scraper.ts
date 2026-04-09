@@ -90,14 +90,26 @@ async function fetchBookIdsFromList(
 
 async function fetchBookDetails(
   bookId: string
-): Promise<{ title: string; author: string; series_name: string | null; series_number: string | null }> {
+): Promise<{ title: string; author: string; series_name: string | null; series_number: string | null; isbn: string | null }> {
   const url = `${TSG_BASE}/books/${bookId}`;
   const html = await fetchPage(url);
   const $ = cheerio.load(html);
 
   const container = $('div.book-title-author-and-series');
   const title = container.find('h3').first().text().trim();
-  const author = container.find('p.font-body.font-medium').first().text().trim();
+
+  const authorP = container.find('p.font-body.font-medium').first();
+  const authorAnchors = authorP.find('a[href^="/authors"]');
+  let author = '';
+  if (authorAnchors.length > 0) {
+    const authorsList: string[] = [];
+    authorAnchors.each((_, el) => {
+      authorsList.push($(el).text().trim());
+    });
+    author = authorsList.join(', ');
+  } else {
+    author = authorP.text().trim();
+  }
 
   // Try to extract series info
   let series_name: string | null = null;
@@ -117,8 +129,30 @@ async function fetchBookDetails(
       series_name = $(anchors[0]).text().trim();
     }
   }
+  
+  let isbn: string | null = null;
+  try {
+    const editionsUrl = `${TSG_BASE}/books/${bookId}/editions`;
+    const editionsHtml = await fetchPage(editionsUrl);
+    const $editions = cheerio.load(editionsHtml);
+    
+    // Find the edition div that corresponds to this exact bookId
+    const editionDiv = $editions(`div.edition-info[data-book-id="${bookId}"]`);
+    if (editionDiv.length > 0) {
+      // Look for the p tag that has "ISBN/UID:"
+      editionDiv.find('p').each((_, el) => {
+        const text = $editions(el).text();
+        if (text.includes('ISBN/UID:')) {
+          isbn = text.replace('ISBN/UID:', '').trim() || null;
+          if (isbn === 'None') isbn = null;
+        }
+      });
+    }
+  } catch (err) {
+    console.error(`Error fetching ISBN for ${bookId}:`, err);
+  }
 
-  return { title: title || 'Unknown Title', author: author || 'Unknown Author', series_name, series_number };
+  return { title: title || 'Unknown Title', author: author || 'Unknown Author', series_name, series_number, isbn };
 }
 
 export async function syncLibrary(
@@ -168,13 +202,15 @@ export async function syncLibrary(
         let author = existing?.author || '';
         let series_name = existing?.series_name || null;
         let series_number = existing?.series_number || null;
+        let isbn = existing?.isbn || null;
 
-        if (!title || !author) {
+        if (!title || !author || !isbn) {
           const details = await fetchBookDetails(bookId);
-          title = details.title;
-          author = details.author;
-          series_name = details.series_name;
-          series_number = details.series_number;
+          title = title || details.title;
+          author = author || details.author;
+          series_name = series_name || details.series_name;
+          series_number = series_number || details.series_number;
+          isbn = isbn || details.isbn;
           await new Promise(r => setTimeout(r, 300));
         }
 
@@ -186,6 +222,7 @@ export async function syncLibrary(
           series_number,
           description: existing?.description || '',
           status,
+          isbn,
         });
       } catch (err) {
         console.error(`Error fetching details for book ${bookId}:`, err);

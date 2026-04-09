@@ -7,6 +7,7 @@ export interface Book {
   series_name: string | null;
   series_number: string | null;
   description: string;
+  isbn: string | null;
   status: 'read' | 'currently-reading' | 'to-read';
   epub_path: string | null;
   cover_path: string | null;
@@ -32,6 +33,7 @@ export interface BookMetadata {
   series_name?: string | null;
   series_number?: string | null;
   description: string;
+  isbn?: string | null;
   coverImagePath?: string; // path to a new cover image file
 }
 
