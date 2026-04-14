@@ -3,6 +3,13 @@
   <h1>Shelfab</h1>
   <p><b>Make your shelf fabulous.</b></p>
   <p>The elegant, automated EPUB manager for readers who value their collection.</p>
+  
+  <p align="center">
+    <a href="https://github.com/mmaarij/shelfab/releases"><img src="https://img.shields.io/github/v/release/mmaarij/shelfab?color=black&style=flat-square" alt="Version" /></a>
+    <a href="https://github.com/mmaarij/shelfab/blob/main/LICENSE"><img src="https://img.shields.io/github/license/mmaarij/shelfab?color=black&style=flat-square" alt="License" /></a>
+    <a href="https://github.com/mmaarij/shelfab/stargazers"><img src="https://img.shields.io/github/stars/mmaarij/shelfab?color=black&style=flat-square" alt="Stars" /></a>
+    <a href="https://github.com/mmaarij/shelfab/releases"><img src="https://img.shields.io/github/downloads/mmaarij/shelfab/total?color=black&style=flat-square" alt="Downloads" /></a>
+  </p>
 </div>
 
 <br />
@@ -74,6 +81,10 @@ Shelfab is free and open-source. If you find it useful and want to help me reach
 
 - ☕ [**Support on Ko-fi**](https://ko-fi.com/mmaarij)
 - ⭐ **Star this repository**
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/chart?repos=mmaarij/shelfab&type=date&legend=bottom-right)](https://www.star-history.com/?repos=mmaarij%2Fshelfab&type=date&legend=bottom-right)
 
 ## 📄 License
 
