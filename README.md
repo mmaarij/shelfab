@@ -6,7 +6,7 @@
   
   <p align="center">
     <a href="https://github.com/mmaarij/shelfab/releases"><img src="https://img.shields.io/github/v/release/mmaarij/shelfab?color=black&style=flat-square" alt="Version" /></a>
-    <a href="https://github.com/mmaarij/shelfab/blob/master/LICENSE"><img src="https://img.shields.io/github/license/mmaarij/shelfab?color=black&style=flat-square" alt="License" /></a>
+    <a href="https://github.com/mmaarij/shelfab/blob/master/LICENSE"><img src="https://img.shields.io/github/license/mmaarij/shelfab?label=license&color=black&style=flat-square" alt="License" /></a>
     <a href="https://github.com/mmaarij/shelfab/stargazers"><img src="https://img.shields.io/github/stars/mmaarij/shelfab?color=black&style=flat-square" alt="Stars" /></a>
     <a href="https://github.com/mmaarij/shelfab/releases"><img src="https://img.shields.io/github/downloads/mmaarij/shelfab/total?color=black&style=flat-square" alt="Downloads" /></a>
   </p>
