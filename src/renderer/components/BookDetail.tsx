@@ -71,11 +71,12 @@ export function BookDetail({ book, onClose, onSave }: BookDetailProps) {
       const epubPath = await window.electronAPI.linkEpub(book.tsg_id);
       if (epubPath) {
         setHasEpub(true);
-        setMsg({ ok: true, text: 'EPUB linked — cover extracted' });
+        setMsg({ ok: true, text: 'EPUB linked — cover and ISBN extracted if available' });
         onSave();
-        // Refresh book data to get the extracted cover
+        // Refresh book data to get the extracted cover and ISBN
         const updated = await window.electronAPI.getBook(book.tsg_id);
         if (updated?.cover_path) setCoverPath(updated.cover_path);
+        if (updated?.isbn) setIsbn(updated.isbn);
       }
     } catch (err: any) {
       setMsg({ ok: false, text: err.message || 'Failed to link' });

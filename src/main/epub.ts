@@ -54,6 +54,29 @@ export async function extractCoverFromEpub(epubPath: string): Promise<string | n
   }
 }
 
+/**
+ * Extract ISBN from an EPUB's metadata.
+ */
+export async function extractIsbnFromEpub(epubPath: string): Promise<string | null> {
+  try {
+    const data = await fs.promises.readFile(epubPath);
+    const zip = await JSZip.loadAsync(data);
+    const { opfContent } = await findOpf(zip);
+    
+    if (!opfContent) return null;
+    
+    const isbnMatch = opfContent.match(/<dc:identifier[^>]*opf:scheme="ISBN"[^>]*>(.*?)<\/dc:identifier>/is);
+    if (isbnMatch && isbnMatch[1]) {
+      return isbnMatch[1].trim();
+    }
+    
+    return null;
+  } catch (err) {
+    console.error('Failed to extract ISBN from EPUB:', err);
+    return null;
+  }
+}
+
 function findCoverHrefFromProperties(opfContent: string): string | null {
   const match = opfContent.match(/<item[^>]*properties="[^"]*cover-image[^"]*"[^>]*href="([^"]+)"[^>]*\/?>/i);
   if (match) return match[1];

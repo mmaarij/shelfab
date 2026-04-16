@@ -10,7 +10,7 @@ import {
 import { syncLibrary } from './scraper';
 import {
   editEpubMetadata, searchIsbn, copyEpubToLibrary,
-  extractCoverFromEpub, reExportAllBooks, clearLibraryFolder,
+  extractCoverFromEpub, extractIsbnFromEpub, reExportAllBooks, clearLibraryFolder,
   deleteLocalCovers
 } from './epub';
 import type { BookMetadata } from '../shared/types';
@@ -75,6 +75,19 @@ export function registerIpcHandlers(): void {
 
     // Always copy to library folder — the copy becomes the canonical file
     const destPath = await copyEpubToLibrary(tsgId, sourcePath, title, author);
+
+    // Override ISBN from EPUB if available
+    const epubIsbn = await extractIsbnFromEpub(destPath);
+    if (epubIsbn && epubIsbn !== book?.isbn) {
+      dbUpdateMeta(tsgId, {
+        title,
+        author: author || '',
+        series_name: book?.series_name || '',
+        series_number: book?.series_number || '',
+        description: book?.description || '',
+        isbn: epubIsbn,
+      });
+    }
 
     // Auto-extract cover from the library copy
     const coverPath = await extractCoverFromEpub(destPath);
