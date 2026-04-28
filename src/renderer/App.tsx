@@ -132,7 +132,10 @@ export default function App() {
         />
       )}
 
-      {showSettings && <SettingsPanel onClose={() => setShowSettings(false)} />}
+      {showSettings && <SettingsPanel onClose={() => {
+        setShowSettings(false);
+        loadBooks(); // Refresh books when settings closes to show auto-links
+      }} />}
     </div>
   );
 }

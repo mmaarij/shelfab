@@ -77,6 +77,30 @@ export async function extractIsbnFromEpub(epubPath: string): Promise<string | nu
   }
 }
 
+/**
+ * Extract Title and Author from an EPUB's metadata.
+ */
+export async function extractEpubMetadata(epubPath: string): Promise<{ title?: string; author?: string } | null> {
+  try {
+    const data = await fs.promises.readFile(epubPath);
+    const zip = await JSZip.loadAsync(data);
+    const { opfContent } = await findOpf(zip);
+    
+    if (!opfContent) return null;
+    
+    const titleMatch = opfContent.match(/<dc:title[^>]*>(.*?)<\/dc:title>/is);
+    const authorMatch = opfContent.match(/<dc:creator[^>]*>(.*?)<\/dc:creator>/is);
+    
+    return {
+      title: titleMatch ? titleMatch[1].trim() : undefined,
+      author: authorMatch ? authorMatch[1].trim() : undefined,
+    };
+  } catch (err) {
+    console.error('Failed to extract metadata from EPUB:', err);
+    return null;
+  }
+}
+
 function findCoverHrefFromProperties(opfContent: string): string | null {
   const match = opfContent.match(/<item[^>]*properties="[^"]*cover-image[^"]*"[^>]*href="([^"]+)"[^>]*\/?>/i);
   if (match) return match[1];

@@ -13,6 +13,7 @@ import {
   extractCoverFromEpub, extractIsbnFromEpub, reExportAllBooks, clearLibraryFolder,
   deleteLocalCovers
 } from './epub';
+import { processAutoLink, finalizeAcceptAutoLink } from './matcher';
 import type { BookMetadata } from '../shared/types';
 
 export function registerIpcHandlers(): void {
@@ -120,6 +121,15 @@ export function registerIpcHandlers(): void {
       throw new Error('No EPUB linked to this book');
     }
     await editEpubMetadata(book.epub_path, metadata, tsgId);
+  });
+
+  ipcMain.handle('epub:auto-link', async (_event, sourceDirectory: string) => {
+    return processAutoLink(sourceDirectory);
+  });
+
+  ipcMain.handle('epub:accept-auto-link', async (_event, tsgId: string, epubPath: string) => {
+    const book = getBook(tsgId) || undefined;
+    await finalizeAcceptAutoLink(tsgId, epubPath, book);
   });
 
   ipcMain.handle('epub:pick-cover-image', async (event) => {

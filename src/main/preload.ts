@@ -19,8 +19,8 @@ const api: ElectronAPI = {
   // EPUB
   editEpubMetadata: (tsgId, metadata) => ipcRenderer.invoke('epub:edit-metadata', tsgId, metadata),
   pickCoverImage: () => ipcRenderer.invoke('epub:pick-cover-image'),
-  reExportAll: () => ipcRenderer.invoke('epub:re-export-all'),
-
+  reExportAll: () => ipcRenderer.invoke('epub:re-export-all'),  autoLinkBooks: (sourceDirectory: string) => ipcRenderer.invoke('epub:auto-link', sourceDirectory),
+  acceptAutoLink: (tsgId: string, epubPath: string) => ipcRenderer.invoke('epub:accept-auto-link', tsgId, epubPath),
   // Settings
   getSetting: (key) => ipcRenderer.invoke('settings:get', key),
   setSetting: (key, value) => ipcRenderer.invoke('settings:set', key, value),

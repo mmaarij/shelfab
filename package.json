@@ -40,6 +40,7 @@
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "electron-squirrel-startup": "^1.0.1",
+    "fuzzball": "^2.2.3",
     "jszip": "^3.10.1",
     "lucide-react": "^0.344.0",
     "react": "^18.2.0",
