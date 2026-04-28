@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { FolderOpen, X, AlertTriangle } from 'lucide-react';
+import { FolderOpen, X, AlertTriangle, Link2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Checkbox } from './ui/checkbox';
 import packageJson from '../../../package.json';
+import { ReviewMatchesModal } from './ReviewMatchesModal';
+import type { AutoLinkResult } from '../../shared/types';
 
 interface SettingsPanelProps {
   onClose: () => void;
@@ -18,6 +20,8 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
   const [saved, setSaved] = useState(false);
   const [showClearModal, setShowClearModal] = useState(false);
   const [deleteFiles, setDeleteFiles] = useState(false);
+  const [isLinking, setIsLinking] = useState(false);
+  const [autoLinkResults, setAutoLinkResults] = useState<AutoLinkResult | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -59,6 +63,21 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
   const confirmClearLibrary = async () => {
     await window.electronAPI.clearLibrary(deleteFiles);
     window.location.reload(); // Refresh to show empty state
+  };
+
+  const handleAutoLink = async () => {
+    const folder = await window.electronAPI.pickFolder();
+    if (!folder) return;
+    
+    setIsLinking(true);
+    try {
+      const results = await window.electronAPI.autoLinkBooks(folder);
+      setAutoLinkResults(results);
+    } catch (err) {
+      console.error('Failed to auto-link:', err);
+    } finally {
+      setIsLinking(false);
+    }
   };
 
   return (
@@ -136,6 +155,24 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
             {saved ? 'Saved ✓' : 'Save Settings'}
           </Button>
 
+          {/* Auto-Linking */}
+          <div className="pt-6 border-t border-border/20 space-y-3 shrink-0">
+            <h3 className="text-[10px] font-medium text-primary/60 uppercase tracking-widest">
+              Tools
+            </h3>
+            <button
+              onClick={handleAutoLink}
+              disabled={isLinking}
+              className="w-full h-9 px-3 rounded-md border border-primary/20 bg-primary/5 text-primary text-xs hover:bg-primary/10 transition-colors flex items-center justify-center gap-2 shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Link2 className="h-3.5 w-3.5" />
+              {isLinking ? 'Processing...' : 'Run Auto-Linker'}
+            </button>
+            <p className="text-[10px] text-muted-foreground/50 leading-relaxed px-1 text-center">
+              Select a folder with EPUB files to automatically link them to your unlinked StoryGraph books using ISBN, Meta, and Filename.
+            </p>
+          </div>
+
           {/* Destructive Actions */}
           <div className="pt-6 border-t border-border/20 space-y-3 shrink-0">
             <h3 className="text-[10px] font-medium text-red-500/60 uppercase tracking-widest">
@@ -197,16 +234,25 @@ export function SettingsPanel({ onClose }: SettingsPanelProps) {
               >
                 Cancel
               </Button>
-              <Button 
-                variant="destructive" 
+              <Button
+                variant="destructive"
                 onClick={confirmClearLibrary}
-                className="h-8 text-xs px-4 bg-red-500 hover:bg-red-600 text-white border-0"
+                className="h-8 text-xs px-4"
               >
                 Clear Library
               </Button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* Review Auto-Link Matches Modal */}
+      {autoLinkResults && (
+        <ReviewMatchesModal
+          results={autoLinkResults}
+          onClose={() => setAutoLinkResults(null)}
+          onAccept={window.electronAPI.acceptAutoLink}
+        />
       )}
     </div>
   );

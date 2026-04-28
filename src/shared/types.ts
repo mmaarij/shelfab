@@ -43,6 +43,28 @@ export interface IsbnResult {
   description: string;
 }
 
+export interface AutoLinkResult {
+  successful: Array<{
+    book: Book;
+    epubPath: string;
+    matchType: 'isbn';
+    epubCoverPath?: string;
+  }>;
+  proposed: Array<{
+    book: Book;
+    epubPath: string;
+    epubTitle?: string;
+    epubAuthor?: string;
+    matchType: 'metadata' | 'filename';
+    confidence: number;
+    epubCoverPath?: string;
+  }>;
+  failed: Array<{
+    epubPath: string;
+    reason: string;
+  }>;
+}
+
 export interface ElectronAPI {
   // Database
   getBooks: () => Promise<Book[]>;
@@ -58,6 +80,8 @@ export interface ElectronAPI {
   editEpubMetadata: (tsgId: string, metadata: BookMetadata) => Promise<void>;
   pickCoverImage: () => Promise<string | null>;
   reExportAll: () => Promise<void>;
+  autoLinkBooks: (sourceDirectory: string) => Promise<AutoLinkResult>;
+  acceptAutoLink: (tsgId: string, epubPath: string) => Promise<void>;
 
   // Settings
   getSetting: (key: string) => Promise<string | null>;
